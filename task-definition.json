@@ -1,0 +1,121 @@
+{
+  "family": "pay1-wallet-payment-service",
+  "containerDefinitions": [
+    {
+      "name": "elasticsearch",
+      "image": "856777607988.dkr.ecr.ap-northeast-1.amazonaws.com/thanhnc/elasticsearch-test:latest",
+      "essential": true,
+      "readonlyRootFilesystem": false,
+      "cpu": 2048,
+      "memory": 4096,
+      "dependsOn": [],
+      "portMappings": [
+        {
+          "containerPort": 9200,
+          "hostPort": 9200,
+          "protocol": "tcp"
+        }
+      ],
+      "mountPoints": [
+        {
+          "containerPath": "/mount/elasticsearch",
+          "sourceVolume": "datadir",
+          "readOnly": false
+        }
+      ],
+      "entryPoint": [],
+      "command": [],
+      "secrets": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/elasticsearch",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "elastícearch"
+        }
+      },
+      "environment": []
+    },
+    {
+      "name": "kibana",
+      "image": "docker.elastic.co/elasticsearch/elasticsearch:8.13.4",
+      "cpu": 512,
+      "memory": 1024,
+      "portMappings": [
+        {
+          "containerPort": 5601,
+          "hostPort": 5601,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "command": [],
+      "secrets": [],
+      "mountPoints": [
+        {
+          "sourceVolume": "datadir",
+          "containerPath": "/mount/kibana",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/elasticsearch",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "kibana"
+        }
+      }
+    },
+    {
+      "name": "logstash",
+      "image": "docker.elastic.co/logstash/logstash:8.13.4",
+      "cpu": 1024,
+      "memory": 2048,
+      "essential": true,
+      "command": [],
+      "secrets": [],
+      "mountPoints": [
+        {
+          "sourceVolume": "datadir",
+          "containerPath": "/mount/logstash",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/elasticsearch",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "logstash"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "datadir",
+      "managedEBSVolume": {
+        "volumeType": "gp3",
+        "sizeInGiB": 50,
+        "roleArn": "arn:aws:iam::856777607988:role/test-ecs-role",
+        "encrypted": true,
+        "kmsKeyId": "arn:aws:kms:ap-northeast-1:856777607988:key/b86bf1f4-acd2-4542-82a3-ff53459edba4"
+      }
+    }
+  ],
+  "taskRoleArn": "arn:aws:iam::856777607988:role/test-ecs-role",
+  "executionRoleArn": "arn:aws:iam::856777607988:role/test-ecs-role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["EC2"],
+  "cpu": "4096",
+  "memory": "8192",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
